@@ -26,7 +26,7 @@
 (: my_min : (Listof Number) Number -> Number) ; helper 1 - Minimum
 (define (my_min lst n)
   (cond [(null? lst) n]                                     ; returns the last number passed down through recursion - thats the minimum
-        [(> n (first lst)) (my_min (rest lst) (first lst))] ; evaluates if n is gt the first number of the first list, and passes that number if its true
+        [(> n (first lst)) (my_min (rest lst) (first lst))] ; evaluates if n is greater then the first number of the list, and passes that number if its true
         [else (my_min (rest lst) n)]))                      ; otherwise passes the current minimum
 
 (: my_max : (Listof Number) Number -> Number) ; helper 2 - Maximum
@@ -35,13 +35,34 @@
         [(< n (first lst)) (my_max (rest lst) (first lst))] ; same logic as helper 1, but with the '<' operator instead
         [else (my_max (rest lst) n)]))
 
-; 1.b - X tests:
+; 1.b - 10 tests:
 (test (min&max null) => '(+inf.0 -inf.0)) ;sanity check 1 - null
 (test (min&max '()) => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
 (test (min&max '(() () () ())) => '(+inf.0 -inf.0)) ;sanity check 3 - list conatining empty lists
 (test (min&max '((+inf.0) (1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 +inf.0))
-(test (min&max '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(-1.0 233.0))
-(test (min&max '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(-1.0 233.0))
-(test (min&max '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(-1.0 233.0))
+(test (min&max '((+inf.0) (1 2 3) (9 2 -1))) => '(-1.0 +inf.0))
+(test (min&max '((1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 9.0))
+(test (min&max '((-2))) => '(-2.0 -2.0))
+(test (min&max '((-2 1))) => '(-2.0 1.0))
+(test (min&max '((-2) (1))) => '(-2.0 1.0))
+(test (min&max '((1 2 3) (2 3 3 4) (9 2 -3) (233 11 90))) => '(-3.0 233.0))
 
 #| 1.c - Apply |#
+(: min&max_apply : (Listof (Listof Number)) -> (Listof Number))
+(define (min&max_apply lst)
+  (let ([lst-open (open-list lst)]) ; https://pl.barzilay.org/lec02#some-style
+    (cond [(null? lst-open) (list +inf.0 -inf.0)]
+          [else (list (apply min lst-open) (apply max lst-open))])))
+
+; 1.c - 10 tests:
+(test (min&max_apply null) => '(+inf.0 -inf.0)) ;sanity check 1 - null
+(test (min&max_apply '()) => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
+(test (min&max_apply '(() () () ())) => '(+inf.0 -inf.0)) ;sanity check 3 - list conatining empty lists
+(test (min&max_apply '((+inf.0) (1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 +inf.0))
+(test (min&max_apply '((+inf.0) (1 2 3) (9 2 -1))) => '(-1.0 +inf.0))
+(test (min&max_apply '((1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 9.0))
+(test (min&max_apply '((-2))) => '(-2 -2))
+(test (min&max_apply '((-2 1))) => '(-2 1))
+(test (min&max_apply '((-2) (1))) => '(-2 1))
+(test (min&max_apply '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(-1 233))
+
