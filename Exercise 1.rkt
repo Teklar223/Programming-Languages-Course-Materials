@@ -1,5 +1,7 @@
 #lang pl
 
+#| ===== Question 1 ===== |#
+
 #| 1.a - open-list |#
 
 (: open-list : (Listof (Listof Number)) -> (Listof Number))
@@ -8,13 +10,20 @@
         [else (append (first lst) (open-list (rest lst)))]))
 
 ; 1.a - 7 tests:
-(test (open-list null) => null) ;sanity check 1 - null
-(test (open-list '()) => null) ;sanity check 2 - empty list
-(test (open-list '(() () () ())) => null) ;sanity check 3 - list conatining empty lists
-(test (open-list '((1 2 3 4))) => '(1 2 3 4)) ;sanity check 3
-(test (open-list '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(1 2 3 2 3 3 4 9 2 -1 233 11 90)) ; given test
-(test (open-list '((1 2 3 4) (5) (6 7) (8 9 10 11 12 13 14 15))) => '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
-(test (open-list '((1) (#|empty|#) (5) (6 7))) => '(1 5 6 7))
+(test (open-list null) ;sanity check 1 - null
+      => null)
+(test (open-list '()) ;sanity check 2 - empty list
+      => null)
+(test (open-list '(() () () ())) ;sanity check 3 - list conatining empty lists
+      => null)
+(test (open-list '((1 2 3 4))) ;sanity check 4 - list conatining 1 element
+      => '(1 2 3 4))
+(test (open-list '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) ; given test
+      => '(1 2 3 2 3 3 4 9 2 -1 233 11 90)) 
+(test (open-list '((1 2 3 4) (5) (6 7) (8 9 10 11 12 13 14 15)))
+      => '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15))
+(test (open-list '((1) (#|empty|#) (5) (6 7)))
+      => '(1 5 6 7))
 
 #| 1.b - min&max |#
 
@@ -36,16 +45,26 @@
         [else (my_max (rest lst) n)]))
 
 ; 1.b - 10 tests:
-(test (min&max null) => '(+inf.0 -inf.0)) ;sanity check 1 - null
-(test (min&max '()) => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
-(test (min&max '(() () () ())) => '(+inf.0 -inf.0)) ;sanity check 3 - list conatining empty lists
-(test (min&max '((+inf.0) (1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 +inf.0))
-(test (min&max '((+inf.0) (1 2 3) (9 2 -1))) => '(-1.0 +inf.0))
-(test (min&max '((1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 9.0))
-(test (min&max '((-2))) => '(-2.0 -2.0))
-(test (min&max '((-2 1))) => '(-2.0 1.0))
-(test (min&max '((-2) (1))) => '(-2.0 1.0))
-(test (min&max '((1 2 3) (2 3 3 4) (9 2 -3) (233 11 90))) => '(-3.0 233.0))
+(test (min&max null)
+      => '(+inf.0 -inf.0)) ;sanity check 1 - null
+(test (min&max '())
+      => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
+(test (min&max '(() () () ()))
+      => '(+inf.0 -inf.0)) ;sanity check 3 - list conatining empty lists
+(test (min&max '((+inf.0) (1 2 3) (-inf.0) (9 2 -1)))
+      => '(-inf.0 +inf.0))
+(test (min&max '((+inf.0) (1 2 3) (9 2 -1)))
+      => '(-1.0 +inf.0))
+(test (min&max '((1 2 3) (-inf.0) (9 2 -1)))
+      => '(-inf.0 9.0))
+(test (min&max '((-2)))
+      => '(-2.0 -2.0))
+(test (min&max '((-2 1)))
+      => '(-2.0 1.0))
+(test (min&max '((-2) (1)))
+      => '(-2.0 1.0))
+(test (min&max '((1 2 3) (2 3 3 4) (9 2 -3) (233 11 90)))
+      => '(-3.0 233.0))
 
 #| 1.c - Apply |#
 (: min&max_apply : (Listof (Listof Number)) -> (Listof Number))
@@ -55,14 +74,78 @@
           [else (list (apply min lst-open) (apply max lst-open))])))
 
 ; 1.c - 10 tests:
-(test (min&max_apply null) => '(+inf.0 -inf.0)) ;sanity check 1 - null
-(test (min&max_apply '()) => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
-(test (min&max_apply '(() () () ())) => '(+inf.0 -inf.0)) ;sanity check 3 - list conatining empty lists
-(test (min&max_apply '((+inf.0) (1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 +inf.0))
-(test (min&max_apply '((+inf.0) (1 2 3) (9 2 -1))) => '(-1.0 +inf.0))
-(test (min&max_apply '((1 2 3) (-inf.0) (9 2 -1))) => '(-inf.0 9.0))
-(test (min&max_apply '((-2))) => '(-2 -2))
-(test (min&max_apply '((-2 1))) => '(-2 1))
-(test (min&max_apply '((-2) (1))) => '(-2 1))
-(test (min&max_apply '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90))) => '(-1 233))
+(test (min&max_apply null)
+      => '(+inf.0 -inf.0)) ;sanity check 1 - null
+(test (min&max_apply '())
+      => '(+inf.0 -inf.0)) ;sanity check 2 - empty list
+(test (min&max_apply '(() () () ()))
+      => '(+inf.0 -inf.0)) ;sanity check 3 - list containing empty lists
+(test (min&max_apply '((+inf.0) (1 2 3) (-inf.0) (9 2 -1)))
+      => '(-inf.0 +inf.0))
+(test (min&max_apply '((+inf.0) (1 2 3) (9 2 -1)))
+      => '(-1.0 +inf.0))
+(test (min&max_apply '((1 2 3) (-inf.0) (9 2 -1)))
+      => '(-inf.0 9.0))
+(test (min&max_apply '((-2)))
+      => '(-2 -2))
+(test (min&max_apply '((-2 1)))
+      => '(-2 1))
+(test (min&max_apply '((-2) (1)))
+      => '(-2 1))
+(test (min&max_apply '((1 2 3) (2 3 3 4) (9 2 -1) (233 11 90)))
+      => '(-1 233))
 
+
+#| ===== Question 2 ===== |#
+
+
+#| 2.1 + 2.2 - Table definition |#
+
+(define-type Table
+            [EmptyTbl]                
+            [Add Symbol String Table])
+
+#| 2.3 - search-table|#
+
+(: search-table : Symbol Table -> (U False String))
+(define (search-table symbol table)
+        (cases table ; so i can access the variables
+               [(EmptyTbl) #f]
+               [(Add sym str tbl)
+                   (cond [(equal? sym symbol) str]          ; if symbols are equal, return the string value
+                         [else (search-table symbol tbl)])] ; otherwise continue searching
+         ))
+
+#| 2.4 - remove-item|#
+
+;(: remove-item : Table Symbol -> Table)
+;(define (remove-item table symbol)
+
+(: remove-item : Table Symbol -> Table)
+(define (remove-item table symbol)
+        (cases table ; so i can access the variables
+               [(EmptyTbl) (EmptyTbl)]
+               [(Add sym str tbl)
+                   (cond [(equal? sym symbol) tbl]                     ; if symbols are equal, return the tbl value (effectively removing the current symbol)
+                         [else (Add sym str (remove-item tbl symbol))])] ; otherwise continue searching, while reconstructing the table thus far.
+         ))
+
+; given tests:
+
+(test (EmptyTbl) => (EmptyTbl))
+(test (Add 'b "B" (Add 'a "A" (EmptyTbl))) =>
+(Add 'b "B" (Add 'a "A" (EmptyTbl))))
+(test (Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl)))) =>
+(Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl)))))
+(test (search-table 'c (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
+(EmptyTbl)))))
+=> #f)
+(test (search-table 'a (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
+(EmptyTbl)))))
+=> "AAA")
+(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
+(EmptyTbl)))) 'a)
+=> (Add 'b "B" (Add 'a "A" (EmptyTbl))))
+(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
+(EmptyTbl)))) 'b)
+=> (Add 'a "AAA" (Add 'a "A" (EmptyTbl))))
