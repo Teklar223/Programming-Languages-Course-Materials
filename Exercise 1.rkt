@@ -82,10 +82,10 @@
       => '(+inf.0 -inf.0)) ;sanity check 3 - list containing empty lists
 (test (min&max_apply '((+inf.0) (1 2 3) (-inf.0) (9 2 -1)))
       => '(-inf.0 +inf.0))
-(test (min&max_apply '((+inf.0) (1 2 3) (9 2 -1)))
-      => '(-1.0 +inf.0))
-(test (min&max_apply '((1 2 3) (-inf.0) (9 2 -1)))
-      => '(-inf.0 9.0))
+(test (min&max_apply '((+inf.0) (1 2 3) (9 2 -1))) ; does *not* return '(-1 +inf.0), (probably) due to the semantics with +inf.0
+      => '(-1.0 +inf.0)) 
+(test (min&max_apply '((1 2 3) (-inf.0) (9 2 -1))) ; "   "   "   "  "  '(-inf.0 9) ,  "    "    "   "   "   "    "    "   -inf.0
+      => '(-inf.0 9.0))  
 (test (min&max_apply '((-2)))
       => '(-2 -2))
 (test (min&max_apply '((-2 1)))
@@ -103,7 +103,8 @@
 
 (define-type Table
             [EmptyTbl]                
-            [Add Symbol String Table])
+            [Add Symbol String Table]
+            )
 
 #| 2.3 - search-table|#
 
@@ -130,22 +131,61 @@
                          [else (Add sym str (remove-item tbl symbol))])] ; otherwise continue searching, while reconstructing the table thus far.
          ))
 
-; given tests:
+; given tests - AKA sanity check:
 
-(test (EmptyTbl) => (EmptyTbl))
-(test (Add 'b "B" (Add 'a "A" (EmptyTbl))) =>
-(Add 'b "B" (Add 'a "A" (EmptyTbl))))
-(test (Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl)))) =>
-(Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl)))))
-(test (search-table 'c (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
-(EmptyTbl)))))
-=> #f)
-(test (search-table 'a (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
-(EmptyTbl)))))
-=> "AAA")
-(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
-(EmptyTbl)))) 'a)
-=> (Add 'b "B" (Add 'a "A" (EmptyTbl))))
-(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A"
-(EmptyTbl)))) 'b)
-=> (Add 'a "AAA" (Add 'a "A" (EmptyTbl))))
+(test (EmptyTbl)
+      => (EmptyTbl))
+(test (Add 'b "B" (Add 'a "A" (EmptyTbl)))
+      => (Add 'b "B" (Add 'a "A" (EmptyTbl))))
+(test (Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl))))
+      => (Add 'a "aa" (Add 'b "B" (Add 'a "A" (EmptyTbl)))))
+(test (search-table 'c (Add 'a "AAA" (Add 'b "B" (Add 'a "A" (EmptyTbl)))))
+      => #f)
+(test (search-table 'a (Add 'a "AAA" (Add 'b "B" (Add 'a "A" (EmptyTbl)))))
+      => "AAA")
+(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A" (EmptyTbl)))) 'a)
+      => (Add 'b "B" (Add 'a "A" (EmptyTbl))))
+(test (remove-item (Add 'a "AAA" (Add 'b "B" (Add 'a "A" (EmptyTbl)))) 'b)
+      => (Add 'a "AAA" (Add 'a "A" (EmptyTbl))))
+
+; other tests:
+
+(test (Add 'very "fun" (Add 'Language ":)" (EmptyTbl)))
+      => (Add 'very "fun" (Add 'Language ":)" (EmptyTbl))))
+(test (Add 'and "another one" (Add 'just "on more" (Add 'very "fun" (Add 'Language ":')" (EmptyTbl)))))
+      => (Add 'and "another one" (Add 'just "on more" (Add 'very "fun" (Add 'Language ":')" (EmptyTbl))))))
+
+#| Table for next tests |#
+
+(test (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))
+      => (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))))
+
+#| 2.3 - search table tests |#
+
+(test (search-table 'f (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; not found
+      => #f)
+(test (search-table 'af (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; not found
+      => #f)
+
+(test (search-table 'a (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; search 'a
+      => "AAAA")
+(test (search-table 'b (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; search 'b
+      => "BBBB")
+(test (search-table 'c (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; search 'c
+      => "CCCC")
+(test (search-table 'd (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))) ; search 'd
+      => "DDDD")
+
+#| 2.4 - remove item tests |#
+
+(test (remove-item  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))) 'a) ; remove 'a
+      =>  (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))
+(test (remove-item  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))) 'b) ; remove 'b
+      =>  (Add 'a "AAAA" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl)))))
+(test (remove-item  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))) 'c) ; remove 'c
+      =>  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'd "DDDD" (EmptyTbl)))))
+(test (remove-item  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))) 'd) ; remove 'd
+      =>  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (EmptyTbl)))))
+
+(test (remove-item  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))) 'f) ; not found
+      =>  (Add 'a "AAAA" (Add 'b "BBBB" (Add 'c "CCCC" (Add 'd "DDDD" (EmptyTbl))))))
